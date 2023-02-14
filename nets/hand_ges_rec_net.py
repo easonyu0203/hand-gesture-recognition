@@ -26,6 +26,8 @@ class HandGesRecNet(nn.Module):
         )
         self.label_idx_to_name = label_idx_to_name
         self.transform = transform
+        self.feature_cnt = feature_cnt
+        self.class_cnt = class_cnt
 
     def forward(self, x):
         x = self.flatten(x)
