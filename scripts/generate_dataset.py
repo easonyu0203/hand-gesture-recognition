@@ -24,7 +24,7 @@ running, the user can use this dataset to train a machine learning model for ges
 parser = argparse.ArgumentParser(description="Hand Gesture Generation")
 
 parser.add_argument("--cap_device", type=int, default=0, help="Index of the webcam device to use (default: 0)")
-parser.add_argument("--gesture", type=str, default=None, help="Gesture to generate (default: None)")
+parser.add_argument("--gesture", type=str, default="thumbs_up", help="Gesture to generate (default: thumbs_up)")
 parser.add_argument("--data-folder", type=str, default="data", help="Root directory for storing data (default: data)")
 
 args = parser.parse_args()
