@@ -30,10 +30,13 @@ and for writing predicted output figures to the summary for every 500 epochs.
 
 To use the script, you can run it from the command line using the following command:
 
-python script_name.py --batch-size 32 --lr 0.001 --epochs 20000 --patience 100 --patience-delta 0.00001 
---save-path ./trained_nets/hand_ges_rec_net
+`python train.py --batch-size 32 --lr 0.001 --epochs 20000 --patience 100 --patience-delta 0.00001 --data-dir ./data
+--save-path ./trained_nets/hand_ges_rec_net`
 
-You can adjust the values of the command line arguments to suit your needs."""
+You can adjust the values of the command line arguments to suit your needs.
+You can also monitor training process using 
+`tensorboard --logdir=runs`
+"""
 
 
 parser = argparse.ArgumentParser(description="Hand Gesture Recognition Training")
@@ -45,6 +48,8 @@ parser.add_argument("--patience", type=int, default=100,
 parser.add_argument("--patience-delta", type=float, default=0.00001,
                     help="minimum change in validation loss to qualify as improvement for early stopping ("
                          "default: 0.00001)")
+parser.add_argument("--data-dir", type=str, default="./data",
+                    help="dir for dataset (default: ./data)")
 parser.add_argument("--save-path", type=str, default="./trained_nets/hand_ges_rec_net",
                     help="path to save trained model (default: ./trained_nets/hand_ges_rec_net)")
 args = parser.parse_args()
@@ -58,6 +63,7 @@ def main():
     patience = args.patience
     patience_delta = args.patience_delta
     save_path = args.save_path
+    data_dir = args.data_dir
 
     # set up
     dataset = MediaGestureDataset(
@@ -65,7 +71,8 @@ def main():
             BasicTransform(),
             NormalizeMaxSpan(1),
             WristAsOrigin()
-        )
+        ),
+        data_dir=data_dir
     )
     train_dataset, valid_dataset = random_split(dataset, [0.8, 0.2])
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
