@@ -1,4 +1,6 @@
 import argparse
+import os.path
+
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, random_split
@@ -113,6 +115,8 @@ def main():
     print("Done!")
 
     # save model
+    if not os.path.exists(os.path.dirname(save_path)):
+        os.mkdir(os.path.dirname(save_path))
     torch.save(best_model, save_path)
 
 
