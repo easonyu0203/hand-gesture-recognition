@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
-from utils.tensorboard_helper import write_loss, write_model_pred_figures
+from utils.tensorboard_helper import write_scalars, write_model_pred_figures
 from datasets.media_gesture import MediaGestureDataset
 from datasets.transformations import BasicTransform, NormalizeMaxSpan, WristAsOrigin
 from nets.hand_ges_rec_net import HandGesRecNet
@@ -39,7 +39,6 @@ You can adjust the values of the command line arguments to suit your needs.
 You can also monitor training process using 
 `tensorboard --logdir=runs`
 """
-
 
 parser = argparse.ArgumentParser(description="Hand Gesture Recognition Training")
 parser.add_argument("--batch-size", type=int, default=32, help="batch size for training (default: 32)")
@@ -100,7 +99,7 @@ def main():
             if val_loss <= best_test_loss:
                 best_model, best_test_loss = copy.deepcopy(model), val_loss
             # write to board
-            write_loss(writer, train_loss, val_loss, t + 1)
+            write_scalars(writer, t + 1, train_loss=train_loss, val_loss=val_loss, accuracy=accuracy)
             if t % 500 == 0:
                 write_model_pred_figures(writer, model, dataset, 4, t + 1, figsize=6)
             # check early stop
