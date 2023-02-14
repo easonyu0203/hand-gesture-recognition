@@ -15,7 +15,7 @@ class MediaGestureDataset(Dataset):
     label_idx_2_name: dict[int, str]
     label_name_2_idx: dict[str, int]
 
-    def __init__(self, data_dir_path="./data", transform=None):
+    def __init__(self, data_dir="./data", transform=None):
         """
         This dataset use media holistic hand landmark as feature with a target gesture
         in data_dir_path, for each kind of gesture should have a [gesture_name].npy file,
@@ -29,14 +29,14 @@ class MediaGestureDataset(Dataset):
         self.label_idx_2_name = dict()
         self.data_size = 0
         # Get a list of all files in the directory
-        files = os.listdir(data_dir_path)
+        files = os.listdir(data_dir)
 
         # Filter out any non-files (directories, symlinks, etc.)
-        files = [f for f in files if os.path.isfile(os.path.join(data_dir_path, f))]
+        files = [f for f in files if os.path.isfile(os.path.join(data_dir, f))]
 
         # load data form files
         for idx, filename in enumerate(files):
-            filepath = os.path.join(data_dir_path, filename)
+            filepath = os.path.join(data_dir, filename)
             base_name = os.path.splitext(filename)[0]
             feature = np.load(filepath)
             feature_dict[base_name] = feature
