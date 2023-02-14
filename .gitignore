@@ -1,5 +1,6 @@
 runs/
 trained_nets/
 data/
+.idea/
 model_training.ipynb
 
