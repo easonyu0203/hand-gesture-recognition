@@ -34,13 +34,19 @@ def main():
     # Arguments parsing ###############################################################
     cap_device = args.cap_device
     gesture_name = args.gesture
-    data_file_path = os.path.join(os.getcwd(), args.data_folder, f"{gesture_name}.npy")
+    data_dir = args.data_folder
+    file_name = f"{gesture_name}.npy"
+    file_path = os.path.join(data_dir, file_name)
 
     # save data system init #####################################################################
+    # create data folder if not exit
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+    # load old data
     data = []
     old_dataset_size, data_old = 0, None
-    if os.path.exists(data_file_path):
-        data_old = np.load(data_file_path)
+    if os.path.exists(file_path):
+        data_old = np.load(file_path)
         old_dataset_size = len(data_old)
 
     # Model Initialize ###############################################################
@@ -83,13 +89,13 @@ def main():
     # save data #####################################################################
     # append to old data
     if data_old is not None and data:
-        data_old = np.load(data_file_path)
+        data_old = np.load(file_path)
         data = np.concatenate((data_old, data))
     # save
     data = np.array(data)
     if data.any():
-        np.save(data_file_path, data)
-        print(f"save data successfully: {data_file_path}")
+        np.save(file_path, data)
+        print(f"save data successfully: {file_path}")
 
     # dispose objects ##############################################################
     cap.release()
