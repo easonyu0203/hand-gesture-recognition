@@ -7,9 +7,9 @@ from datasets.media_gesture import MediaGestureDataset
 from random import randint
 
 
-def write_loss(writer, train_loss, test_loss, epoch):
-    writer.add_scalar("Train loss", train_loss, epoch)
-    writer.add_scalar("Test loss", test_loss, epoch)
+def write_scalars(writer, epoch, **kwargs):
+    for key, value in kwargs.items():
+        writer.add_scalar(f"{key}", value, epoch)
 
 
 def write_model_pred_figures(writer, model, dataset: MediaGestureDataset, cnt, epoch, figsize=6):
