@@ -1,9 +1,10 @@
 import torch
 import cv2
 import argparse
-from nets.my_holistic import MyHolistic
-from nets.hand_ges_rec_net import HandGesRecNet
+
+from nets.hand_gesture_predictor import HandGesturePredictor
 from utils.CV_Draw import Draw
+from utils.cv2.video_input import VideoInput
 
 """This script is a demo for hand gesture recognition using the MediaPipe and PyTorch libraries. The script takes two 
 command line arguments, the index of the webcam device to use and the path to the trained hand gesture recognition 
@@ -30,71 +31,46 @@ args = parser.parse_args()
 
 
 def main():
-    # Arguments parsing ###############################################################
-    cap_device = args.device
-    hand_net_path = args.hand_net_path
+    detector = HandGestureDetector(args.device, args.hand_net_path)
+    detector.start()
 
-    # set up net #####################################################################
-    hand_ges_rec_net: HandGesRecNet = torch.load(hand_net_path)
-    holistic = MyHolistic()
 
-    # Start video input ###############################################################
-    cap = cv2.VideoCapture(cap_device)
-    while cap.isOpened():
-        success, image = cap.read()
-        if not success:
-            continue
+class HandGestureDetector:
+    def __init__(self, device, hand_net_path):
+        self.video_input = VideoInput(device)
+        self.hand_gesture_predictor = HandGesturePredictor(hand_net_path)
+        self.video_input.on_image_processed = self.process_image
 
-        # Flip the image horizontally for a selfie-view display.
-        image = cv2.flip(image, 1)
-        # process image ##############################################################
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        result, holistic_result = net_pipeline_process(image, holistic, hand_ges_rec_net)
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    def start(self):
+        self.video_input.start()
+
+    def stop(self):
+        self.video_input.stop()
+
+    def process_image(self, image):
+        result, holistic_result = self.hand_gesture_predictor.process(image)
 
         # Draw Result ##############################################################
         draw = Draw()
         image = draw.draw_hand_landmark(holistic_result, image)
         if result["left"]:
             name, conf = result["left"]["name"], result["left"]["confidence"]
-            image = draw.draw_box(holistic_result.left_np, image, title=f"{name} {conf:<2f}")
+            is_outlier, outlier_conf = result["left"]["is_outlier"], result["left"]["outlier_confidence"]
+            out_str = ("outlier" if is_outlier == -1 else "inlier") + f" {conf:2<f}"
+            image = draw.draw_box(holistic_result.left_np, image, title=f"{name} {conf:<2f}, {out_str}")
         if result["right"]:
             name, conf = result["right"]["name"], result["right"]["confidence"]
-            image = draw.draw_box(holistic_result.right_np, image, title=f"{name} {conf:<2f}")
+            is_outlier, outlier_conf = result["right"]["is_outlier"], result["right"]["outlier_confidence"]
+            out_str = ("outlier" if is_outlier == -1 else "inlier") + f" {conf:2<f}"
+            image = draw.draw_box(holistic_result.right_np, image, title=f"{name} {conf:<2f} {conf:<2f}, {out_str}")
 
         # Key press ##############################################################
         key = cv2.waitKey(5) & 0xFF
         if key == 27:  # esc
-            break
+            self.stop()
 
         # show ##############################################################
         cv2.imshow('MediaPipe Holistic', image)
-
-
-def hand_net_process(hand_ges_rec_net, landmarks):
-    # transform landmarks for hand_ges_rec_net
-    landmarks = torch.from_numpy(landmarks).type(torch.float)
-    features = hand_ges_rec_net.transform(landmarks)
-    # net make prediction
-    pred_label_name, confidence = hand_ges_rec_net.predict(features.unsqueeze(0))
-    # TODO: use one class SVM to check in outlier
-    
-    return pred_label_name[0], confidence[0]
-
-
-def net_pipeline_process(image, holistic: MyHolistic, hand_ges_rec_net: HandGesRecNet):
-    # holistic process
-    holistic_result = holistic.process(image)
-    # hand net process
-    left_result, right_result = None, None
-    if holistic_result.left_hand_landmarks:
-        pred_label_name, confidence = hand_net_process(hand_ges_rec_net, holistic_result.left_np)
-        left_result = {"name": pred_label_name, "confidence": confidence.item()}
-    if holistic_result.right_hand_landmarks:
-        pred_label_name, confidence = hand_net_process(hand_ges_rec_net, holistic_result.right_np)
-        right_result = {"name": pred_label_name, "confidence": confidence.item()}
-
-    return {"left": left_result, "right": right_result}, holistic_result
 
 
 if __name__ == '__main__':
