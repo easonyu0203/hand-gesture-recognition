@@ -38,7 +38,7 @@ def main():
 class HandGestureDetector:
     def __init__(self, device, hand_net_path):
         self.video_input = VideoInput(device)
-        self.hand_gesture_predictor = HandGesturePredictor(hand_net_path)
+        self.hand_gesture_predictor = HandGesturePredictor(hand_net_path, nu=0.3)
         self.video_input.on_image_processed = self.process_image
 
     def start(self):
@@ -62,7 +62,7 @@ class HandGestureDetector:
             name, conf = result["right"]["name"], result["right"]["confidence"]
             is_outlier, outlier_conf = result["right"]["is_outlier"], result["right"]["outlier_confidence"]
             out_str = ("outlier" if is_outlier == -1 else "inlier") + f" {conf:2<f}"
-            image = draw.draw_box(holistic_result.right_np, image, title=f"{name} {conf:<2f} {conf:<2f}, {out_str}")
+            image = draw.draw_box(holistic_result.right_np, image, title=f"{name} {conf:<2f}, {out_str}")
 
         # Key press ##############################################################
         key = cv2.waitKey(5) & 0xFF

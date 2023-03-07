@@ -6,9 +6,14 @@ from nets.outlier_detector import OutlierDetector
 
 
 class HandGesturePredictor:
-    def __init__(self, hand_net_path):
+    def __init__(self, hand_net_path, nu=0.5):
+        """
+
+        :param hand_net_path: path for hand net
+        :param nu: 0~1, nu mean the upper bound of train error for outlier detection
+        """
         self.hand_ges_rec_net = torch.load(hand_net_path)
-        self.outlier_detector = OutlierDetector(nu=0.5, verbose=1)
+        self.outlier_detector = OutlierDetector(nu=nu, verbose=1)
         self.holistic = MyHolistic()
 
     def process(self, image):

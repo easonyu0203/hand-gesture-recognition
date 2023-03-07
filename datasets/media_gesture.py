@@ -15,13 +15,14 @@ class MediaGestureDataset(Dataset):
     label_idx_2_name: dict[int, str]
     label_name_2_idx: dict[str, int]
 
-    def __init__(self, data_dir="./data", transform=None):
+    def __init__(self, data_dir="./data", transform=None, train_transform=None):
         """
         This dataset use media holistic hand landmark as feature with a target gesture
         in data_dir_path, for each kind of gesture should have a [gesture_name].npy file,
         in .npy file should be shape [num_record, 21(hand landmarks), 3(x,y,z)]
         """
         self.transform = transform
+        self.train_transform = train_transform
         feature_dict = dict()
         label_dict = dict()
         self.data_size_dict = dict()
@@ -76,4 +77,6 @@ class MediaGestureDataset(Dataset):
         feature = self.features[idx]
         if self.transform:
             feature = self.transform(feature)
+        if self.train_transform:
+            feature = self.train_transform(feature)
         return feature, target

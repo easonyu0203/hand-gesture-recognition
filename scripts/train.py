@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 from utils.tensorboard_helper import write_scalars, write_model_pred_figures
 from datasets.media_gesture import MediaGestureDataset
-from datasets.transformations import BasicTransform, NormalizeMaxSpan, WristAsOrigin
+from datasets.transformations import BasicTransform, NormalizeMaxSpan, WristAsOrigin, RandomMirror, RandomRotate
 from nets.hand_ges_rec_net import HandGesRecNet
 from utils.train.early_stopper import EarlyStopper
 from tqdm import tqdm
@@ -44,8 +44,8 @@ parser = argparse.ArgumentParser(description="Hand Gesture Recognition Training"
 parser.add_argument("--batch-size", type=int, default=32, help="batch size for training (default: 32)")
 parser.add_argument("--lr", type=float, default=1e-3, help="learning rate for training (default: 0.001)")
 parser.add_argument("--epochs", type=int, default=20000, help="number of epochs to train (default: 20000)")
-parser.add_argument("--patience", type=int, default=100,
-                    help="number of epochs to wait before early stopping (default: 100)")
+parser.add_argument("--patience", type=int, default=1000,
+                    help="number of epochs to wait before early stopping (default: 1000)")
 parser.add_argument("--patience-delta", type=float, default=0.0001,
                     help="minimum change in validation loss to qualify as improvement for early stopping ("
                          "default: 0.00001)")
@@ -73,6 +73,10 @@ def main():
             NormalizeMaxSpan(1),
             WristAsOrigin()
         ),
+        train_transform=nn.Sequential(
+            RandomMirror(),
+            RandomRotate(30)
+        ),
         data_dir=data_dir
     )
     train_dataset, valid_dataset = random_split(dataset, [0.8, 0.2])
@@ -81,7 +85,8 @@ def main():
     writer = SummaryWriter()
     model = HandGesRecNet(
         feature_cnt=dataset.feature_cnt, class_cnt=dataset.class_cnt,
-        transform=dataset.transform, label_idx_to_name=dataset.label_idx_2_name
+        transform=dataset.transform, label_idx_to_name=dataset.label_idx_2_name,
+        train_transform=dataset.train_transform
     )
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)

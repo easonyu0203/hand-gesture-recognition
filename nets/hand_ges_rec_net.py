@@ -7,7 +7,7 @@ class HandGesRecNet(nn.Module):
     net for hand gesture recognition using mediapipe landmarks as input
     """
 
-    def __init__(self, feature_cnt, class_cnt, transform, label_idx_to_name=None):
+    def __init__(self, feature_cnt, class_cnt, transform, train_transform, label_idx_to_name=None):
         """
         net for hand gesture recognition using mediapipe landmarks as input
         :param feature_cnt: feature_cnt
@@ -26,6 +26,7 @@ class HandGesRecNet(nn.Module):
         )
         self.label_idx_to_name = label_idx_to_name
         self.transform = transform
+        self.train_transform = train_transform
         self.feature_cnt = feature_cnt
         self.class_cnt = class_cnt
 

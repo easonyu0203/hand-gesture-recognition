@@ -5,7 +5,7 @@ import torch
 from sklearn import svm
 from torch import nn
 from datasets.media_gesture import MediaGestureDataset
-from datasets.transformations import BasicTransform, NormalizeMaxSpan, WristAsOrigin
+from datasets.transformations import BasicTransform, NormalizeMaxSpan, WristAsOrigin, RandomMirror, RandomRotate
 
 
 class OutlierDetector:
@@ -22,8 +22,8 @@ class OutlierDetector:
             data_dir=data_dir
         )
         X_train = []
-        for feature, _ in dataset:
-            X_train.append(feature)
+        [X_train.append(feature) for feature, _ in dataset]
+
         X_train = torch.stack(X_train, dim=0)
         X_train = self.flatten(X_train)
         if verbose == 1:
