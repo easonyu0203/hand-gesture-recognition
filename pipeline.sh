@@ -4,14 +4,14 @@ export PYTHONPATH=$(pwd)
 # this script will generate dataset => train model => demo it
 
 # Define the list of gesture names
-name_list=("one" "two" "three")
+# shellcheck disable=SC2039
+name_list=("shoot" "grab" "hold")
 
 # remove all data, run, trained_net
-rm -rf data
-rm -rf trained_nets
-rm -rf runs
+./rm_all_data_run_model.sh
 
 # Loop through the list and run the generate_dataset.py script with each gesture name
+# shellcheck disable=SC2039
 for name in "${name_list[@]}"
 do
     python scripts/generate_dataset.py --gesture "$name"

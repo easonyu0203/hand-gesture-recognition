@@ -1,6 +1,6 @@
 import argparse
 import os.path
-
+import subprocess
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, random_split
@@ -46,7 +46,7 @@ parser.add_argument("--lr", type=float, default=1e-3, help="learning rate for tr
 parser.add_argument("--epochs", type=int, default=20000, help="number of epochs to train (default: 20000)")
 parser.add_argument("--patience", type=int, default=100,
                     help="number of epochs to wait before early stopping (default: 100)")
-parser.add_argument("--patience-delta", type=float, default=0.00001,
+parser.add_argument("--patience-delta", type=float, default=0.0001,
                     help="minimum change in validation loss to qualify as improvement for early stopping ("
                          "default: 0.00001)")
 parser.add_argument("--data-dir", type=str, default="./data",
@@ -152,4 +152,7 @@ def val_loop(dataloader, model, loss_fn):
 
 
 if __name__ == '__main__':
+    # Start TensorBoard as a subprocess
+    subprocess.Popen(["tensorboard", "--logdir=runs"])
+    # main
     main()

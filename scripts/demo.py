@@ -72,9 +72,13 @@ def main():
 
 
 def hand_net_process(hand_ges_rec_net, landmarks):
+    # transform landmarks for hand_ges_rec_net
     landmarks = torch.from_numpy(landmarks).type(torch.float)
     features = hand_ges_rec_net.transform(landmarks)
+    # net make prediction
     pred_label_name, confidence = hand_ges_rec_net.predict(features.unsqueeze(0))
+    # TODO: use one class SVM to check in outlier
+    
     return pred_label_name[0], confidence[0]
 
 
