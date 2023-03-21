@@ -19,12 +19,13 @@ parser = argparse.ArgumentParser(description="Hand Gesture Recognition")
 parser.add_argument("--device", type=int, default=0, help="Index of the webcam device to use (default: 0)")
 parser.add_argument("--hand-net-path", type=str, default="./trained_nets/hand_ges_rec_net",
                     help="Path to the trained hand gesture recognition model (default: ./trained_nets/hand_ges_rec_net)")
+parser.add_argument("--data-dir", type=str, default="./data", help="Path to dataset")
 args = parser.parse_args()
 
 
 async def main():
     video_input = VideoInput(args.device)
-    hand_gesture_predictor = HandGesturePredictor(args.hand_net_path, outlier_nu=0.3)
+    hand_gesture_predictor = HandGesturePredictor(args.hand_net_path, args.data_dir, outlier_nu=0.3)
 
     # start video input
     asyncio.create_task(video_input.start())

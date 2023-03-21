@@ -9,8 +9,7 @@ line argument, which is the path to the folder containing the numpy arrays. When
 the numpy arrays in the folder and prints out the class name, the number of records in that class, and the mean and 
 standard deviation of the data for that class.
 
-To use the script, you should first make sure that you have numpy installed, as the script depends on the numpy 
-library. You can then run the script from the command line by typing:
+You can then run the script from the command line by typing:
 python explore_data.py /path/to/data/folder
 
 where /path/to/data/folder is the path to the folder containing the numpy arrays that you want to explore. When you 

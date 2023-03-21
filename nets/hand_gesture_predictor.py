@@ -6,17 +6,24 @@ from nets.outlier_detector import OutlierDetector
 
 
 class HandGesturePredictor:
-    def __init__(self, hand_net_path, outlier_nu=0.5):
+    def __init__(self, hand_net_path: str, data_dir: str, outlier_nu: float = 0.5):
         """
-
         :param hand_net_path: path for hand net
+        :param data_dir: path for data folder
         :param outlier_nu: 0~1, nu mean the upper bound of train error for outlier detection
         """
         self.hand_ges_rec_net = torch.load(hand_net_path)
-        self.outlier_detector = OutlierDetector(nu=outlier_nu, verbose=1)
+        self.outlier_detector = OutlierDetector(data_dir=data_dir, nu=outlier_nu, verbose=1)
         self.holistic = MyHolistic()
 
     def process(self, image):
+        """
+        input image and get result of the predictor
+        :param image: image
+        :return: (result, holistic_result)
+        result: dict contain predictor result for left and right hand, this have two keys: left and right
+        holistic_result: the result give by internal holistic model
+        """
         # convert image to RGB
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # process image ##############################################################
