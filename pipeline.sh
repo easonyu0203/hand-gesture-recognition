@@ -1,27 +1,31 @@
 #!/bin/sh
 export PYTHONPATH=$(pwd)
 
-# this script will generate dataset => train model => demo it
+# Check if the list of gesture names is provided as an argument
+if [ $# -eq 0 ]
+then
+  echo "Error: List of gesture names not provided."
+  echo "Usage: ./run_script.sh <gesture_name_1> <gesture_name_2> ... <gesture_name_n>"
+  exit 1
+fi
 
-# Define the list of gesture names
-# shellcheck disable=SC2039
-name_list=("one")
+# Set the list of gesture names from the command-line arguments
+name_list=("$@")
 
-# remove all data, run, trained_net
+# Remove all data, run, and trained_net
 ./rm_all_data_run_model.sh
 
 # Loop through the list and run the generate_dataset.py script with each gesture name
-# shellcheck disable=SC2039
 for name in "${name_list[@]}"
 do
     python scripts/generate_dataset.py --gesture "$name"
 done
 
-# check dataset
+# Check the dataset
 python scripts/explore_data.py
 
-# train
+# Train the model
 python scripts/train.py
 
-# demo
+# Demo the model
 python scripts/demo.py

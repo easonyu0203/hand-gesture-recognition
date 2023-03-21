@@ -26,15 +26,12 @@ class OutlierDetector:
 
         X_train = torch.stack(X_train, dim=0)
         X_train = self.flatten(X_train)
-        if verbose == 1:
-            print("fit outlier detector...")
         self.clf.fit(X_train)
-        if verbose == 1:
-            print("finish fit!")
 
     def prediction(self, X):
         X = self.flatten(X)
         y_pred = self.clf.predict(X)
         decision_scores = self.clf.decision_function(X)
-        probabilities = 100.0 / (1.0 + np.exp(-decision_scores))
+        probabilities = decision_scores
+        # probabilities = 100.0 / (1.0 + np.exp(-decision_scores))
         return y_pred, probabilities
