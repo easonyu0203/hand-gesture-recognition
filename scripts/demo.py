@@ -5,7 +5,6 @@ import cv2
 from nets.hand_gesture_predictor import HandGesturePredictor
 from nets.utils.draw_result import draw_result
 from utils.cv2.video_input import VideoInput
-from utils.CV_Draw import Draw
 
 """This script is a demo for hand gesture recognition using the MediaPipe and PyTorch libraries. The script takes two 
 command line arguments, the index of the webcam device to use and the path to the trained hand gesture recognition 
